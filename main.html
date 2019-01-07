@@ -1,0 +1,151 @@
+<!DOCTYPE HTML>
+<!--This is designed by Li Jiachen with No.3160103838-->
+<html>
+    <!--HTML头部分，包含网页标题名称，网页所用字符编码集，载入CSS样式，适配各种终端的浏览器-->
+    <head>  
+        <meta charset="utf-8">
+        <title>身高体重查询器|Designed by LJC</title>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="description" content="">
+        <meta name="keywords" content="">
+        <meta name="viewport"
+              content="width=device-width, initial-scale=1">
+    
+        <!-- Set render engine for 360 browser -->
+        <meta name="renderer" content="webkit">
+      
+        <!-- No Baidu Siteapp-->
+        <meta http-equiv="Cache-Control" content="no-siteapp"/>
+      
+        <link rel="icon" type="image/png" href="./ui/assets/i/favicon.png">
+      
+        <!-- Add to homescreen for Chrome on Android -->
+        <meta name="mobile-web-app-capable" content="yes">
+        <link rel="icon" sizes="192x192" href="./ui/assets/i/app-icon72x72@2x.png">
+      
+        <!-- Add to homescreen for Safari on iOS -->
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black">
+        <meta name="apple-mobile-web-app-title" content="Amaze UI"/>
+        <link rel="apple-touch-icon-precomposed" href="./ui/assets/i/app-icon72x72@2x.png">
+      
+        <!-- Tile icon for Win8 (144x144 + tile color) -->
+        <meta name="msapplication-TileImage" content="./ui/assets/i/app-icon72x72@2x.png">
+        <meta name="msapplication-TileColor" content="#0e90d2">
+      
+        <link rel="stylesheet" href="./ui/assets/css/amazeui.min.css">
+        <link rel="stylesheet" href="./ui/assets/css/app.css">
+
+        <style type="text/css">
+          body.bg{background-image: url("./ui/background/bg3.png");}
+        </style>
+    </head>
+
+    <!--代码导入部分-->
+    <!--scripts-->
+    <script src="./script/data.js"></script>
+    <script src="./script/vue.js"></script>
+    <script src="./script/jquery.js"></script>
+    <script src="./script/clock.js"></script>
+    <script src="./script/find_position.js"></script>
+    <script src="./script/quad_interpolation.js"></script>
+    <script src="./script/format_control.js"></script>
+    <script src="./script/category.js"></script>
+    <script src="./script/cal_mon_age.js"></script>
+
+
+
+
+    <!--主体部分，包括网页的布局、样式，显示的内容-->
+    <!--body-->
+    <body class="bg" onload="startTime()">
+        <div class="header">
+            <div class="am-g" style="text-align:center">
+              <h1>身高体重查询器</h1>
+              <p style="text-align:center">Designed by Li Jiachen</p>
+            </div>
+            <div style="text-align:center">
+              <h3>当前时间：</h3>
+              <p id="clock"></p>
+            </div>
+            <hr />
+          </div>
+
+          <div class="am-g" >
+            <div class="am-u-lg-6 am-u-md-8 am-u-sm-centered">
+              <h3>使用说明：</h3>
+              <p>&emsp;&emsp;这是一个基于web开发的儿童身高体重计算器，适用于计算七岁以下儿童的正常身高。<br><br>
+                 &emsp;&emsp;这个小应用将帮助您计算您孩子在当前年龄的理想身高、体重，并根据数据分析孩子的生长情况，从而为您孩子的健康规划提供参考意见。<br>
+              </p>  
+              <hr>
+              <div style="text-align:center">
+                <h3>孩子基本信息</h3>
+              </div>
+              <form action="passbirthday" method="get" class="am-form" id="birthdayform">
+                <label for="birthday">生日:</label>
+                <label for="date"></label>
+                <input type="date" name="date">
+              </form>
+              
+              <br>
+
+              <form action="passgender" method="get" id="genderform" class="am-form">
+                <p><b>性别：</b></p>
+                <input type="radio" name="gender" id="gender1" value="male">男
+                <br>
+                <input type="radio" name="gender" id="gender2" value="female">女
+              </form>
+                
+              <hr>
+              <div style="text-align:center">
+                <h3>请输入您孩子的真实数据</h3>
+              </div>
+              
+              <form action="passheight" method="get" id="heightform" class="am-form">
+                <label for="height">身高(cm)：</label>
+                <input type="text" name="height" id="height"><br>
+              </form>
+              
+              <form action="passweight" method="get" id="weightform" class="am-form">
+                <label for="weight">体重(kg)：</label>
+                <input type="text" name="weight" id="weight">
+              </form>
+              <br>
+
+              <div class="am-cf">
+                <input type="button" name="" value="计 算" class="am-btn am-btn-primary am-btn-sm am-fl" onclick="cal()">
+              </div>
+              <hr>
+              
+              <div style="text-align:center">
+                  <h3>计算结果</h3>
+              </div>
+              
+              <b>理想身高：</b><p id="hres" style="text-align:center"></p>
+              <p id="htext" style="text-align:center"></p>
+              <b>理想体重：</b><p id="wres" style="text-align:center"></p>
+              <p id="wtext" style="text-align:center"></p>
+
+              
+              <hr>
+
+              <p>※ 此页面专为数值计算方法课程设计作业编写，请不要用于其他目的。</p>
+
+            </div>
+          </div>
+    </body>
+
+    <!--用于向不同函数传递参数的代码以及将答案传递到网页合适位置显示出来的代码-->
+    <!--other scripts-->
+    <script type="text/javascript">
+      function cal(){
+        document.getElementById("hres").innerHTML = formatControl(quad(data, $('input:radio[name="gender"]:checked').val(), "height", calAge($('input[name="date"]').val(), now.toLocaleDateString()), parseFloat($("input[name='height']").val()))) + "cm";
+        document.getElementById("htext").innerHTML = "您孩子的身高" + cate(result.pos);
+        document.getElementById("wres").innerHTML = formatControl(quad(data, $('input:radio[name="gender"]:checked').val(), "weight", calAge($('input[name="date"]').val(), now.toLocaleDateString()), parseFloat($("input[name='weight']").val()))) + "kg";
+        document.getElementById("wtext").innerHTML = "您孩子的体重" + cate(result.pos);
+      }
+    </script>
+
+
+
+</html>
